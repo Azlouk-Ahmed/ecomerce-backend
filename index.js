@@ -6,6 +6,7 @@ const userRoute = require("./routes/userRoutes");
 const adressRouter = require("./routes/adressRouter");
 const productrouter = require("./routes/productRouter");
 const orderRouter = require("./routes/orderRoutes");
+const promotionrouter = require("./routes/promotionRoutes");
 require("dotenv").config();
 
 
@@ -18,6 +19,7 @@ app.use(express.json());
 
 app.use('/user', userRoute);
 app.use('/adress', adressRouter);
+app.use('/promotion', promotionrouter);
 app.use('/product', productrouter);
 app.use('/order', orderRouter);
 

@@ -1,4 +1,5 @@
-const Promotion = require('../models/promotion');
+const Promotion = require('../models/promotionModel');
+const Product = require('../models/productModel');
 
 
 exports.addPromotion = async (req, res) => {
@@ -7,9 +8,13 @@ exports.addPromotion = async (req, res) => {
     try {
         const { expireDate, amount } = req.body;
 
-        const productObj = await Promotion.find({product : id});
-        if(productObj) {
-            res.status(400).json({ success: false, error: "promotion exist already" });
+        const product = await Product.findById(id);
+        if(!product) {
+            return res.status(400).json({ success: false, error: "product not found" });
+        }
+        const existingPromotions = await Promotion.find({ product: id });
+        if (existingPromotions.length > 0) {
+            return res.status(400).json({ success: false, error: "Promotion already exists for this product" });
         }
         const newPromotion = new Promotion({
             product: id,
@@ -21,7 +26,7 @@ exports.addPromotion = async (req, res) => {
 
         res.status(201).json({ success: true, data: newPromotion });
     } catch (error) {
-        res.status(400).json({ success: false, error: error.message });
+        res.status(405).json({ success: false, error: error.message });
     }
 };
 
@@ -47,23 +52,22 @@ exports.modifyPromotion = async (req, res) => {
         const { id } = req.params;
         const { expireDate, amount } = req.body;
 
+        const updatedPromotion = await Promotion.findOneAndUpdate(
+            { _id: id },
+            { expireDate, amount } ,
+            { new: true }
+        );
 
-        let promotion = await Promotion.findById(id);
-
-        if (!promotion) {
+        if (!updatedPromotion) {
             return res.status(404).json({ success: false, error: 'Promotion not found' });
         }
 
-        if (expireDate) promotion.expireDate = expireDate;
-        if (amount) promotion.amount = amount;
-
-        await promotion.save();
-
-        res.json({ success: true, data: promotion });
+        res.json({ success: true, data: updatedPromotion });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
     }
 };
+
 
 exports.deletePromotion = async (req, res) => {
     try {

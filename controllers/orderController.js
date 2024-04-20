@@ -1,3 +1,4 @@
+const Product = require('../models/productModel');
 const Order = require('../models/orderModel');
 
 exports.createOrder = async (req, res) => {
@@ -18,6 +19,7 @@ exports.createOrder = async (req, res) => {
     }
 };
 
+
 exports.updateOrderStatus = async (req, res) => {
     try {
         const { id } = req.params;
@@ -29,6 +31,16 @@ exports.updateOrderStatus = async (req, res) => {
             return res.status(404).json({ success: false, error: 'Order not found' });
         }
 
+        if ((order.status !== 'Shipped' && status === 'Shipped') || (order.status !== 'Delivered' && status === 'Delivered')) {
+            for (const item of order.items) {
+                const product = await Product.findById(item.product);
+                if (product) {
+                    product.stock -= item.quantity;
+                    await product.save();
+                }
+            }
+        }
+
         order.status = status;
         await order.save();
 
@@ -37,6 +49,7 @@ exports.updateOrderStatus = async (req, res) => {
         res.status(500).json({ success: false, error: error.message });
     }
 };
+
 
 exports.deleteOrder = async (req, res) => {
     try {

@@ -2,15 +2,16 @@ const express = require('express');
 const adressRouter = express.Router();
 const { createAddress, updateAddress, deleteAddress, getSpecificAddress } = require('../controllers/adressControllers');
 const requireAdminAuth = require('../middlewares/requireAdminAuth');
+const requireAuth = require('../middlewares/requireUserAuth');
 
 
 
-adressRouter.post('/', createAddress);
+adressRouter.post('/',requireAuth, createAddress);
 
-adressRouter.put('/:id', updateAddress);
+adressRouter.put('/:id',requireAuth, updateAddress);
 
-adressRouter.delete('/:id', deleteAddress);
+adressRouter.delete('/:id',requireAuth, deleteAddress);
 
-adressRouter.get('/:userId',requireAdminAuth, getSpecificAddress);
+adressRouter.get('/:userId', getSpecificAddress);
 
 module.exports = adressRouter;
