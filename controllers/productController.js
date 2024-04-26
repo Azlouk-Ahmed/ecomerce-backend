@@ -21,6 +21,28 @@ exports.createProduct = async (req, res) => {
     }
 };
 
+exports.searchProducts = async (req, res) => {
+    try {
+        const { key, value } = req.body;
+        const searchCriteria = { [key]: value };
+        const products = await Product.find(searchCriteria);
+        return res.json({ success: true, data: products });
+    } catch (error) {
+        res.status(400).json({ success: false, error: error.message });
+    }
+};
+
+exports.getValuesByProperty = async (req, res) => {
+    try {
+        const { property } = req.params;
+        const distinctValues = await Product.distinct(property);
+        return res.json({ success: true, data: distinctValues });
+    } catch (error) {
+        res.status(400).json({ success: false, error: error.message });
+    }
+};
+
+
 exports.updateProduct = async (req, res) => {
     try {
         const { id } = req.params;

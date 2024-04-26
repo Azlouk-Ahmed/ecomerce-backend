@@ -16,7 +16,7 @@ app.use(cors({
 }));
 
 app.use(express.json());
-
+    
 app.use('/user', userRoute);
 app.use('/adress', adressRouter);
 app.use('/promotion', promotionrouter);
